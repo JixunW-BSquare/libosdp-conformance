@@ -21,50 +21,40 @@
   http://www.securityindustry.org
 */
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
 #define EQUALS ==
 
-
-int
-  main
-    (int
-      argc,
-    char
-      *argv [])
-
+int main(int
+             argc,
+    char* argv[])
 { /* initiator */
 
-  int
-    done;
-  FILE
-    *ef;
-  int
-    status;
+    int
+        done;
+    FILE* ef;
+    int
+        status;
 
-  status = 0;
-  fprintf (stderr, "repeating command: %s\n",
-    argv [1]);
-  done = 0;
-  system ("echo yes >server_enable");
-  while (!done)
-  {
-    system (argv [1]);
-    sleep (5);
-    ef = fopen ("server_enable", "r");
-    if (ef EQUALS NULL)
-    {
-      fprintf (stderr, "server no longer enabled.  exiting.\n");
-      done = 1;
+    status = 0;
+    fprintf(stderr, "repeating command: %s\n",
+        argv[1]);
+    done = 0;
+    system("echo yes >server_enable");
+    while (!done) {
+        system(argv[1]);
+        sleep(5);
+        ef = fopen("server_enable", "r");
+        if (ef EQUALS NULL) {
+            fprintf(stderr, "server no longer enabled.  exiting.\n");
+            done = 1;
+        };
     };
-  };
-  if (status != 0)
-    fprintf (stderr, "exit with status %d\n",
-      status);
-  return (status);
+    if (status != 0)
+        fprintf(stderr, "exit with status %d\n",
+            status);
+    return (status);
 
 } /* initiator */
-
