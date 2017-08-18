@@ -7,12 +7,13 @@ include_directories(include aes src-485 src-lib src-tls src-ui)
 
 link_libraries(jansson)
 
-set(SOURCE_FILES
+set (COMMON_HEADER_FILES
+        aes/aes.h
         include/open-osdp.h
-        include/osdp-tls.h
-        include/osdp_conformance.h
-        src-485/open-osdp.c
-        src-485/osdp-local-config.h
+        include/osdp_conformance.h)
+
+set (LIB_SOURCE_FILES
+        aes/aes.c
         src-lib/oo_cmdbreech.c
         src-lib/oo_initialize.c
         src-lib/oo_process.c
@@ -26,7 +27,16 @@ set(SOURCE_FILES
         src-lib/oosdp_secure.c
         src-lib/oosdp_ui.c
         src-lib/osdp-api.c
-        aes/aes.c
-        aes/aes.h)
+        ${COMMON_HEADER_FILES})
 
-add_executable(libosdp_conformance ${SOURCE_FILES})
+set(SOURCE_FILES
+        src-485/osdp-local-config.h
+        src-485/open-osdp.c
+        ${COMMON_HEADER_FILES})
+
+
+
+add_library(libosdp SHARED ${LIB_SOURCE_FILES})
+
+link_libraries(libosdp)
+add_executable(open-osdp ${SOURCE_FILES})
