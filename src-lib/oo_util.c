@@ -249,7 +249,7 @@ int osdp_check_command_reply(int role, int command, OSDP_MSG* m, char* tlogmsg2)
 
             // if we don't recognize the command/reply code it fails 2-15-1
             osdp_conformance.CMND_REPLY.test_status = OCONFORM_FAIL;
-            SET_FAIL(ctx, "2-15-1");
+            // SET_FAIL(ctx, "2-15-1");
             break;
 
         case OSDP_NAK:

@@ -218,6 +218,53 @@ int read_command(OSDP_CONTEXT* ctx,
         };
     };
 
+    if (status EQUALS ST_OK) {
+        if (0 EQUALS strcmp(current_command, "send_buffer")) {
+            cmd->command = OSDP_CMDB_SEND_BUFFER;
+            if (ctx->verbosity > 3) {
+                fprintf(stderr, "command was %s\n", this_command);
+            }
+
+            json_t* buffer = json_object_get(root, "buffer");
+
+            if (json_is_array(buffer)) {
+                size_t len = json_array_size(buffer);
+                if (len > sizeof(cmd->details)) {
+                    fprintf(stderr, "buffer too big!\n");
+                } else {
+                    cmd->payload_length = len;
+                    for (int i = 0; i < len; i++) {
+                        json_t* v = json_array_get(buffer, i);
+                        if (json_is_integer(v)) {
+                            int byte = json_integer_value(v);
+                            if (byte > 0xFF || byte < 0) {
+                                fprintf(stderr, "buffer[%d] is out of range!\n", i);
+                            } else {
+                                cmd->details[i] = (unsigned char)byte;
+                            }
+                        } else {
+                            fprintf(stderr, "buffer[%d] is not an integer!\n", i);
+                        }
+                    }
+                    strcpy(ctx->text, "buffer sent(as byte array)");
+                }
+            } else if (json_is_string(buffer)) {
+                size_t len = json_string_length(buffer);
+
+                if (len > sizeof(cmd->details)) {
+                    fprintf(stderr, "buffer too big, will be trimed.\n");
+                }
+
+                cmd->payload_length = len;
+                memcpy(cmd->details, json_string_value(value), min(len, sizeof(cmd->details)));
+                strcpy(ctx->text, "buffer sent(as string)");
+            } else {
+                fprintf(stderr, "unknown type of buffer.\n");
+                cmd->payload_length = 0;
+            }
+        };
+    };
+
     // COMSET.  takes two option arguments, "new_address" and "new_speed".
     // default for new_address is 0x00, default for new_speed is 9600
 
