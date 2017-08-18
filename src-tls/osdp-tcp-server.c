@@ -136,8 +136,7 @@ int initialize(OSDP_TLS_CONFIG* config,
     };
 
     memset(&last_time_check_ex, 0, sizeof(last_time_check_ex));
-    sprintf(context.command_path,
-        OSDP_LCL_COMMAND_PATH, tag);
+    sprintf(context.command_path, OSDP_LCL_COMMAND_PATH, tag);
     context.current_menu = OSDP_MENU_TOP;
 
     if (status EQUALS ST_OK) {

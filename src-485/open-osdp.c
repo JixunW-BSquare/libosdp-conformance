@@ -35,42 +35,26 @@
 #include "../include/osdp_conformance.h"
 #include <osdp-local-config.h>
 
-int
-    check_for_command;
-OSDP_CONTEXT
-context;
-struct timespec
-    last_time_check_ex;
-OSDP_BUFFER
-osdp_buf;
-OSDP_INTEROP_ASSESSMENT
-osdp_conformance;
-OSDP_OUT_CMD
-current_output_command[16];
-OSDP_PARAMETERS
-p_card;
-char
-    tag[1024]; // PD or CP as a string
+int check_for_command;
+OSDP_CONTEXT context;
+struct timespec last_time_check_ex;
+OSDP_BUFFER osdp_buf;
+OSDP_INTEROP_ASSESSMENT osdp_conformance;
+OSDP_OUT_CMD current_output_command[16];
+OSDP_PARAMETERS p_card;
+char tag[8]; // PD or CP as a string
 
-unsigned char
-    creds_buffer_a[64 * 1024];
-int
-    creds_buffer_a_lth;
-int
-    creds_buffer_a_next;
-int
-    creds_buffer_a_remaining;
+unsigned char creds_buffer_a[64 * 1024];
+int creds_buffer_a_lth;
+int creds_buffer_a_next;
+int creds_buffer_a_remaining;
 
 void check_serial(OSDP_CONTEXT* ctx)
 {
-    struct termios
-        serial_termios;
-    speed_t
-        speed;
-    int
-        status_io;
+    struct termios serial_termios;
+    speed_t speed;
+    int status_io = tcgetattr(ctx->fd, &serial_termios);
 
-    status_io = tcgetattr(ctx->fd, &serial_termios);
     fprintf(stderr, "tcgetattr returned %d\n", status_io);
     speed = cfgetispeed(&serial_termios);
     fprintf(stderr, "input speed %d\n", speed);
@@ -78,17 +62,12 @@ void check_serial(OSDP_CONTEXT* ctx)
     fprintf(stderr, "output speed %d\n", speed);
 }
 
-int initialize(int
-                   argc,
-    char* argv[])
+int initialize(int argc, char* argv[])
 { /* initialize */
 
-    char
-        command[1024];
-    pid_t
-        my_pid;
-    int
-        status;
+    char command[1024];
+    pid_t my_pid;
+    int status;
 
     status = ST_OK;
     check_for_command = 0;
@@ -96,90 +75,87 @@ int initialize(int
     memset(&context, 0, sizeof(context));
     strcpy(context.init_parameters_path, "open-osdp-params.json");
     strcpy(context.log_path, "open-osdp.log");
+
+    // First parameter as config path
     if (argc > 1) {
         strcpy(context.init_parameters_path, argv[1]);
-    };
+    }
+
     status = initialize_osdp(&context);
     context.current_menu = OSDP_MENU_TOP;
-    ;
 
     // set things up depending on role.
 
-    strcpy(tag, "PD");
-    if (context.role EQUALS OSDP_ROLE_CP)
-        strcpy(tag, "CP");
-    if (context.role EQUALS OSDP_ROLE_MONITOR)
-        strcpy(tag, "MON");
-    sprintf(context.command_path,
-        "/opt/osdp-conformance/run/%s/open_osdp_command.json", tag);
+    switch(context.role) {
+        case OSDP_ROLE_CP:
+            strcpy(tag, "CP");
+            break;
+
+        case OSDP_ROLE_PD:
+            strcpy(tag, "PD");
+            break;
+
+        case OSDP_ROLE_MONITOR:
+            strcpy(tag, "MON");
+            break;
+
+        default:
+            status = ST_BAD_ROLE;
+    }
+
+    printf("Role: %s\n", tag);
+
+    sprintf(context.command_path, OSDP_LCL_COMMAND_PATH, tag);
+
+#if ENABLE_WEB_RPC
     // initialize my current pid
     my_pid = getpid();
-    sprintf(command, OSPD_LCL_SET_PID_TEMPLATE,
-        tag, my_pid);
+    sprintf(command, OSPD_LCL_SET_PID_TEMPLATE, tag, my_pid);
     system(command);
+#else
+    system("mkdir -p ./tmp");
+#endif
 
     if (status EQUALS ST_OK) {
         status = init_serial(&context, p_card.filename);
-    };
-    if (status EQUALS ST_OK) {
-        if (context.role EQUALS OSDP_ROLE_CP)
-            fprintf(stderr, "Role: CP\n");
-        if (context.role EQUALS OSDP_ROLE_PD)
-            fprintf(stderr, "Role: PD\n");
-    };
+    }
 
-    return (status);
+    return status;
 
 } /* initialize */
 
-int main(int
-             argc,
-    char* argv[])
+int main(int argc, char* argv[])
 { /* main for open-osdp */
 
-    int
-        c1;
-    int
-        done;
-    fd_set
-        exceptfds;
-    fd_set
-        readfds;
-    int
-        scount;
-    const sigset_t
-        sigmask;
-    int
-        status;
-    int
-        status_io;
-    int
-        status_select;
-    struct timespec
-        timeout;
-    int
-        ufd;
-    fd_set
-        writefds;
+    int c1;
+    int done;
+    fd_set exceptfds;
+    fd_set readfds;
+    int scount;
+    const sigset_t sigmask;
+    int status;
+    int status_io;
+    int status_select;
+    struct timespec timeout;
+    fd_set writefds;
 
-    status = ST_OK;
+    int ufd = 0;
+
     status = initialize(argc, argv);
     memset(&last_time_check_ex, 0, sizeof(last_time_check_ex));
+
+
     done = 0;
-    fprintf(stderr, "role %02x\n",
-        context.role);
+
     if (status != ST_OK)
         done = 1;
 
     // set up a unix socket so commands can be injected
 
     {
-        char
-            sn[1024];
-        int
-            status_socket;
-        struct sockaddr_un
-            usock;
+        char sn[1024];
+        int status_socket;
+        struct sockaddr_un usock;
 
         memset(sn, 0, sizeof(1024));
         sprintf(sn, OSDP_LCL_UNIX_SOCKET, tag);
@@ -189,19 +165,19 @@ int main(int
             memset(&usock, 0, sizeof(usock));
             usock.sun_family = AF_UNIX;
             unlink(sn);
+
             strcpy(usock.sun_path, sn);
-            if (context.verbosity > 3)
-                fprintf(stderr, "unix socket path %s\n",
-                    usock.sun_path);
+            fprintf(stderr, "unix socket path %s\n", usock.sun_path);
             status_socket = bind(ufd, (struct sockaddr*)&usock, sizeof(usock));
             if (status_socket != -1) {
                 status_socket = fcntl(ufd, F_SETFL,
                     fcntl(ufd, F_GETFL, 0) | O_NONBLOCK);
                 if (status_socket != -1)
                     status_socket = listen(ufd, 0);
-            };
-        };
-    };
+            }
+        }
+    }
+
     check_serial(&context);
     while (!done) {
         fflush(context.log);
@@ -211,18 +187,17 @@ int main(int
         FD_ZERO(&readfds);
         FD_SET(ufd, &readfds);
         FD_SET(context.fd, &readfds);
-        if (ufd > context.fd)
-            scount = ufd + 1;
-        else
-            scount = context.fd + 1;
+
+        // Ensure a write to socket or serial will trigger.
+        scount = max(context.fd, ufd) + 1;
+
         FD_ZERO(&writefds);
         FD_ZERO(&exceptfds);
         timeout.tv_sec = 0;
         timeout.tv_nsec = 100000000;
-        status_select = pselect(scount, &readfds, &writefds, &exceptfds,
-            &timeout, &sigmask);
+        status_select = pselect(scount, &readfds, &writefds, &exceptfds, &timeout, &sigmask);
 
-        if (status_select EQUALS - 1) {
+        if (status_select EQUALS -1) {
             status = ST_SELECT_ERROR;
 
             // if it's an interrupt, fake it's ok.  assume a legitimate HUP
@@ -233,8 +208,9 @@ int main(int
                 status_select = 0;
             } else {
                 fprintf(stderr, "errno at select error %d\n", errno);
-            };
-        };
+            }
+        }
+
         if (status_select EQUALS 0) {
             status = ST_OK;
             if (osdp_timeout(&context, &last_time_check_ex)) {
@@ -243,30 +219,25 @@ int main(int
                     status = write_status(&context);
 
                 // if "the timer" went off, do the background process
-
                 if (status EQUALS ST_OK)
                     status = background(&context);
-            };
-        };
+            }
+        }
 
         // if there was data at the 485 file descriptor, process it.
         // if we got kicked in the unix socket, process the waiting command
-
         if (status_select > 0) {
-            if (context.verbosity > 9)
-                fprintf(stderr, "%d descriptors from pselect\n",
-                    status_select);
+            if (context.verbosity > 9) {
+                fprintf(stderr, "%d descriptors from pselect\n", status_select);
+            }
 
             // check for command input (unix socket activity pokes us to check)
-
             if (FD_ISSET(ufd, &readfds)) {
                 char cmdbuf[2];
                 c1 = accept(ufd, NULL, NULL);
-                if (context.verbosity > 5)
-                    fprintf(stderr, "ufd socket(%d) was selected in READ (new fd %d)\n",
-                        ufd, c1);
+                fprintf(stderr, "ufd socket(%d) poked (new fd %d)\n", ufd, c1);
                 if (c1 != -1) {
-                    status_io = read(c1, cmdbuf, sizeof(cmdbuf));
+                    status_io = (int)read(c1, cmdbuf, sizeof(cmdbuf));
                     if (status_io > 0) {
                         close(c1);
 
@@ -277,19 +248,19 @@ int main(int
                         status = ST_OK;
                     };
                 };
-            };
+            }
 
+            // Or if something written to tty device.
             if (FD_ISSET(context.fd, &readfds)) {
                 unsigned char buffer[2];
-                status_io = read(context.fd, buffer, 1);
+                status_io = (int)read(context.fd, buffer, 1);
                 if (status_io < 1) {
                     //status = ST_SERIAL_READ_ERR;
                     // continue if it was a serial error
                     status = ST_OK;
                 } else {
                     if (context.verbosity > 9)
-                        fprintf(stderr, "485 read returned %d bytes\n",
-                            status_io);
+                        fprintf(stderr, "485 read returned %d bytes\n", status_io);
 
                     status = ST_SERIAL_IN;
                     if (osdp_buf.next < sizeof(osdp_buf.buf)) {
@@ -302,9 +273,9 @@ int main(int
                         // (checksum mechanism copes with SOM's in the middle of a msg.)
 
                         if (osdp_buf.next EQUALS 1) {
-                            if (!(osdp_buf.buf[0] EQUALS C_SOM))
+                            if (osdp_buf.buf[0] != C_SOM) {
                                 osdp_buf.next = 0;
-                            // zzz move up one byte
+                            }
                         };
                     } else {
                         status = ST_SERIAL_OVERFLOW;
@@ -326,17 +297,13 @@ int main(int
             done = 1;
     };
     if (status != ST_OK)
-        fprintf(stderr, "open-osdp return status %d\n",
-            status);
+        fprintf(stderr, "open-osdp return status %d\n", status);
 
     return (status);
 
 } /* main for open-osdp */
 
-int send_osdp_data(OSDP_CONTEXT* context,
-    unsigned char* buf,
-    int
-        lth)
+int send_osdp_data(OSDP_CONTEXT* context, unsigned char* buf, int lth)
 { /* send_osdp_data */
 
     if (context->verbosity > 9) {

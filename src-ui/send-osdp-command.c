@@ -35,7 +35,7 @@ int main(int
         printf("</HEAD><BODY>");
         strcpy(command, arguments + strlen(tag));
         if (0 == strcmp(command, "stop"))
-            system("sudo -n killall open-osdp");
+            system("killall open-osdp");
     };
     strcpy(tag, "cmd=CP-");
     if (0 == strncmp(tag, arguments, strlen(tag))) {
@@ -51,13 +51,13 @@ int main(int
         printf("<BR><BR><BR><P ALIGN=\"center\">Executing %s command...</P>\n",
             command);
         sprintf(shell_command,
-            "sudo -n /opt/osdp-conformance/bin/write-osdp-CP-command %s",
+            "/opt/osdp-conformance/bin/write-osdp-CP-command %s",
             command);
         system(shell_command);
-        system("sudo -n /opt/osdp-conformance/bin/HUP-CP");
+        system("/opt/osdp-conformance/bin/HUP-CP");
         strcpy(tag, "stop");
         if (0 == strncmp(tag, command, strlen(tag))) {
-            system("sudo -n /opt/osdp-conformance/bin/STOP-CP");
+            system("/opt/osdp-conformance/bin/STOP-CP");
         };
     };
     strcpy(tag, "cmd=PD-");
@@ -72,15 +72,15 @@ int main(int
         printf("<BR><BR><BR><P ALIGN=\"center\">Executing %s command...</P>\n",
             command);
         sprintf(shell_command,
-            "sudo -n /opt/osdp-conformance/bin/write-osdp-PD-command %s",
+            "/opt/osdp-conformance/bin/write-osdp-PD-command %s",
             command);
         system(shell_command);
-        system("sudo -n /opt/osdp-conformance/bin/HUP-PD");
+        system("/opt/osdp-conformance/bin/HUP-PD");
 
         strcpy(command, arguments + strlen(tag));
         strcpy(tag, "stop");
         if (0 == strncmp(tag, command, strlen(tag))) {
-            system("sudo -n /opt/osdp-conformance/bin/STOP-PD");
+            system("/opt/osdp-conformance/bin/STOP-PD");
         };
     };
     printf("</BODY></HTML>\n");

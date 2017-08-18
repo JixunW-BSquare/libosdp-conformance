@@ -21,7 +21,17 @@
 
 #pragma once
 
+#define max(a, b)  ( a > b ? a : b )
+
+#ifdef ENABLE_WEB_RPC
+#undef ENABLE_WEB_RPC
+#define ENABLE_WEB_RPC 1
+#else
+#define ENABLE_WEB_RPC 0
+#endif
+
 #include <stdio.h>
+#include <stdlib.h>
 #include <termios.h>
 #include <time.h>
 
@@ -423,8 +433,7 @@ typedef struct osdp_context {
         next_out;
     int
         authenticated;
-    char
-        command_path[1024];
+    char command_path[1024];
     int
         cmd_hist_counter;
     char
@@ -721,6 +730,8 @@ typedef struct osdp_multi_hdr {
 #define ST_OSDP_BAD_KEY_SELECT (56)
 #define ST_OSDP_NO_SCBK (57)
 #define ST_OSDP_UNKNOWN_KEY (58)
+
+#define ST_BAD_ROLE (101)
 
 int
     m_version_minor;

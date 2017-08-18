@@ -25,6 +25,7 @@
 //#include <arpa/inet.h>
 
 #include <open-osdp.h>
+#include <osdp-local-config.h>
 
 extern OSDP_PARAMETERS
     p_card;
@@ -55,8 +56,12 @@ int write_status(OSDP_CONTEXT* ctx)
         strcpy(tag, "PD");
     else
         strcpy(tag, "CP");
-    sprintf(statfile, "/opt/osdp-conformance/run/%s/open-osdp-status.json",
-        tag);
+
+#if ENABLE_WEB_RPC
+    sprintf(statfile, "/opt/osdp-conformance/run/%s/open-osdp-status.json", tag);
+#else
+    sprintf(statfile, OSDP_LCL_SERVER_RESULTS, tag);
+#endif
     sf = fopen(statfile, "w");
     if (sf != NULL) {
         current_time = time(NULL);

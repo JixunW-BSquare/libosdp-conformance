@@ -24,6 +24,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
+#include <osdp-local-config.h>
 
 char socket_path[1024];
 
@@ -41,9 +42,7 @@ int main(int argc, char* argv[])
         if (strcmp(argv[1], "PD") == 0)
             tag = "PD";
     };
-    sprintf(socket_path,
-        "/opt/osdp-conformance/run/%s/open-osdp-control",
-        tag);
+    sprintf(socket_path, OSDP_LCL_UNIX_SOCKET, tag);
 
     if ((fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
         perror("socket error");

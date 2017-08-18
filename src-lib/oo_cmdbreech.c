@@ -35,40 +35,31 @@ int read_command(OSDP_CONTEXT* ctx,
 { /* read_command */
 
     FILE* cmdf;
-    char
-        current_command[1024];
-    char
-        current_options[1024];
-    char
-        field[1024];
-    int
-        i;
-    char
-        json_string[16384];
+    char current_command[1024];
+    char current_options[1024];
+    char field[1024];
+    int i;
+    char json_string[16384];
     json_t* parameter;
     json_t* root;
-    json_error_t
-        status_json;
-    int
-        status;
-    int
-        status_io;
+    json_error_t status_json;
+    int status;
+    ssize_t status_io;
     char* test_command;
-    char
-        this_command[1024];
+    char this_command[1024];
     json_t* value;
-    char
-        vstr[1024];
+    char vstr[1024];
 
     status = ST_CMD_PATH;
     cmdf = fopen(ctx->command_path, "r");
     if (cmdf != NULL) {
         status = ST_OK;
         memset(json_string, 0, sizeof(json_string));
-        status_io = fread(json_string,
-            sizeof(json_string[0]), sizeof(json_string), cmdf);
+        status_io = fread(json_string, sizeof(json_string[0]), sizeof(json_string), cmdf);
+
         if (status_io >= sizeof(json_string))
             status = ST_CMD_OVERFLOW;
+
         if (status_io <= 0)
             status = ST_CMD_UNDERFLOW;
     };

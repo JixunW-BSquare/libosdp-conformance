@@ -221,7 +221,7 @@ int local_socket_setup(int* lcl_sock_fd)
         tag = "CP";
     else
         tag = "PD";
-    sprintf(sn, "/opt/osdp-conformance/run/%s/open-osdp-control", tag);
+    sprintf(sn, OSDP_LCL_UNIX_SOCKET, tag);
 
     ufd = socket(AF_UNIX, SOCK_STREAM, 0);
     if (ufd != -1) {

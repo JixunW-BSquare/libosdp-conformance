@@ -27,16 +27,16 @@
 //#include <osdp-tls.h>
 #include <open-osdp.h>
 #include <osdp_conformance.h>
+#include <osdp-local-config.h>
 
 #define LOG_REPORT(lfargs)                        \
-    {                                             \
+    do {                                          \
         sprintf lfargs;                           \
         fprintf(ctx->log, "%s\n", log_string);    \
         fflush(ctx->log);                         \
         fprintf(ctx->report, "%s\n", log_string); \
         fflush(ctx->report);                      \
-    };
-
+    } while (0)
 
 static char* role_tag;
 
@@ -351,7 +351,7 @@ void dump_conformance(OSDP_CONTEXT* ctx,
         oconf->CHKSUM_CRC16.test_status = OCONFORM_EXERCISED;
     };
 
-    ctx->report = fopen("/opt/osdp-conformance/log/report.log", "w");
+    ctx->report = fopen(OSDP_BASE_DIR "/report.log", "w");
 
     LOG_REPORT((log_string, "Conformance Report:"));
     LOG_REPORT((log_string,

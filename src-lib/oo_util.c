@@ -187,18 +187,11 @@ int osdp_build_message(unsigned char* buf,
 
 } /* osdp_build_message */
 
-int osdp_check_command_reply(int
-                                 role,
-    int
-        command,
-    OSDP_MSG* m,
-    char* tlogmsg2)
+int osdp_check_command_reply(int role, int command, OSDP_MSG* m, char* tlogmsg2)
 { /* osdp_check_command_reply */
 
-    OSDP_CONTEXT
-    *ctx;
-    int
-        status;
+    OSDP_CONTEXT *ctx;
+    int status;
 
     ctx = &context;
     status = ST_OK;
@@ -293,8 +286,7 @@ int osdp_check_command_reply(int
     };
     if (ctx->verbosity > 8) {
         if ((status != ST_OSDP_CMDREP_FOUND) && (status != ST_OK))
-            fprintf(stderr,
-                "bottom of osdp_check_command_reply: bad status %d\n", status);
+            fprintf(stderr, "bottom of osdp_check_command_reply: bad status %d\n", status);
     };
     return (status);
 
