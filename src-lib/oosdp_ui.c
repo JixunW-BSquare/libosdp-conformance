@@ -483,6 +483,10 @@ fprintf (stderr, "2-6-1 packet_size_limits marked as exercised.\n");
       };
       break;
 
+    case OSDP_CMDB_SEND_BUFFER:
+        status = send_osdp_data(context, cmd->details, cmd->payload_length);
+        break;
+
     default:
       status = ST_CMD_UNKNOWN;
       break;
