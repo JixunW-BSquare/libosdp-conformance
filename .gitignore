@@ -18,3 +18,4 @@ src-ui/vm-status
 
 .idea
 build-*
+tmp/
