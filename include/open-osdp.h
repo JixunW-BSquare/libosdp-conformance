@@ -22,6 +22,7 @@
 #pragma once
 
 #define max(a, b)  ( a > b ? a : b )
+#define min(a, b)  ( a < b ? a : b )
 
 #ifdef ENABLE_WEB_RPC
 #undef ENABLE_WEB_RPC
@@ -160,6 +161,8 @@
 #define OSDP_CMDB_BUZZ (1022)
 #define OSDP_CMDB_BUSY (1023)
 #define OSDP_CMDB_KEYPAD (1024)
+
+#define OSDP_CMDB_SEND_BUFFER (2001)
 
 #define OSDP_CMD_NOOP (0)
 #define OSDP_CMD_CP_DIAG (1)
@@ -535,10 +538,9 @@ typedef struct osdp_buffer {
 } OSDP_BUFFER;
 
 typedef struct osdp_command {
-    int
-        command;
-    unsigned char
-        details[128];
+    int command;
+    unsigned char details[128];
+    size_t payload_length;
 } OSDP_COMMAND;
 
 typedef struct osdp_param {
@@ -809,7 +811,7 @@ int osdp_timeout(OSDP_CONTEXT* ctx, struct timespec* last_time_check_ex);
 
 void preserve_current_command(void);
 
-int process_command(int command, OSDP_CONTEXT* context, char* details);
+int process_command(int command, OSDP_CONTEXT* context, char* details, OSDP_COMMAND* cmd);
 
 int process_current_command(void);
 
