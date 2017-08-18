@@ -1,0 +1,7 @@
+{
+  "command" : "buzz",
+  "on_time" : "1",
+  "off_time" : "1",
+  "repeat" : "3",
+  "#" : "created by 100-test-all in test"
+}
