@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 
+'''
+OSDP-Poke
+
+Use --help to get help.
+Can also be used as a module to poke programmly.
+
+Supportes Python 3.x
+'''
+
 import sys
 import argparse
 import socket
@@ -7,23 +16,38 @@ import os
 import time
 import json
 
-def print_erasable(s):
-    sys.stderr.write(s + '\r')
+def print_erasable(string):
+    '''
+    print an erasable line.
+    '''
+    sys.stderr.write(string + '\r')
     sys.stderr.flush()
 
-def delete_file(f):
-    if os.path.exists(f):
-        os.unlink(f)
+def delete_file(path):
+    '''
+    delete a file if exists without raise an exception.
+    '''
+    if os.path.exists(path):
+        os.unlink(path)
 
 def clear_line():
+    '''
+    clear current line.
+    '''
     print('\033[2K', end='')
     sys.stdout.flush()
 
-def print_json(s):
-    j = json.loads(s)
+def print_json(string):
+    '''
+    format and print given json string.
+    '''
+    j = json.loads(string)
     print(json.dumps(j, indent=2))
 
-def poke(cmd, type):
+def poke(cmd, tag):
+    '''
+    poke the CP / PD so it will process the command.
+    '''
     try:
         json.loads(cmd)
     except Exception as ex:
@@ -32,22 +56,22 @@ def poke(cmd, type):
 
     # prepare command
     print_erasable("writing command...")
-    cmd_path = './tmp/command_%s.json' % type
+    cmd_path = './tmp/command_%s.json' % tag
     delete_file(cmd_path)
-    with open(cmd_path, 'w') as f:
-        f.write(cmd)
+    with open(cmd_path, 'w') as file:
+        file.write(cmd)
     clear_line()
     print("Wrote command: ", end='')
     print_json(cmd)
 
     # poke so it knows it need to execute command
-    result_path = './tmp/result_%s' % type
+    result_path = './tmp/result_%s' % tag
     delete_file(result_path)
 
-    socket_path = './tmp/socket_%s' % type
-    s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-    s.connect(socket_path)
-    s.send(bytes('< poke >', 'utf-8'))
+    socket_path = './tmp/socket_%s' % tag
+    sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    sock.connect(socket_path)
+    sock.send(bytes('< poke >', 'utf-8'))
 
     print_erasable("waiting for result...")
     counter = 10
@@ -62,14 +86,23 @@ def poke(cmd, type):
     clear_line()
 
     print("Got reply: ", end='')
-    with open(result_path, 'r') as f:
-        print_json(f.read())
+    with open(result_path, 'r') as file:
+        print_json(file.read())
 
-
-def main(argv):
+def main():
+    '''
+    main function
+    '''
     parser = argparse.ArgumentParser()
-    parser.add_argument("type",    help="CP / PD / MON; will write to 'tmp/command_[type].json'")
-    parser.add_argument("command", help="command json file, or '-' to read from stdin.")
+    parser.add_argument("type",
+                        help="""
+        CP / PD / MON; will write to 'tmp/command_[type].json'
+    """)
+    parser.add_argument("command",
+                        help="""
+        command json file, or '-' to read from stdin.
+        If is a simple string (matches \\w) then it will wrap to a json.
+    """)
 
     args = parser.parse_args()
 
@@ -78,10 +111,10 @@ def main(argv):
         print("hit enter then ctrl-d to commit your command. arrow key does not work.")
         cmd = sys.stdin.read()
     else:
-        with open(args.command, 'r') as f:
-            cmd = f.read()
+        with open(args.command, 'r') as file:
+            cmd = file.read()
 
     poke(cmd, args.type)
 
 if __name__ == "__main__":
-    main(sys.argv)
+    main()
