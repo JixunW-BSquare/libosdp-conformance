@@ -5,6 +5,10 @@ set(CMAKE_CXX_STANDARD 11)
 
 include_directories(include aes src-485 src-lib src-tls src-ui)
 
+add_executable(sign src-cli/sign.cpp)
+
+
+
 link_libraries(jansson)
 
 set (COMMON_HEADER_FILES
@@ -33,8 +37,6 @@ set(SOURCE_FILES
         src-485/osdp-local-config.h
         src-485/open-osdp.c
         ${COMMON_HEADER_FILES})
-
-
 
 add_library(libosdp SHARED ${LIB_SOURCE_FILES})
 
