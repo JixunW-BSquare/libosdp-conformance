@@ -15,6 +15,22 @@ import socket
 import os
 import time
 import json
+import re
+
+COMMON_KEYS = [
+    "role", "#", "serial_speed", "pd_address", "max_pd_send", "cp_polls",
+    "pd_acks", "sent_naks", "out-00", "out-01", "out-02", "out-03",
+    "out-04", "out-05", "out-06", "out-07", "out-08", "out-09", "out-10",
+    "out-11", "out-12", "out-13", "out-14", "out-15", "power_report",
+    "verbosity", "crc", "timeout", "poll", "dump", "checksum_errors",
+    "keypad_last_8", "raw_data_bits", "raw_data", "last_update"
+]
+
+def file_exists(path):
+    '''
+    check if given file path exists.
+    '''
+    return os.path.exists(path)
 
 def print_erasable(string):
     '''
@@ -27,7 +43,7 @@ def delete_file(path):
     '''
     delete a file if exists without raise an exception.
     '''
-    if os.path.exists(path):
+    if file_exists(path):
         os.unlink(path)
 
 def clear_line():
@@ -37,21 +53,28 @@ def clear_line():
     print('\033[2K', end='')
     sys.stdout.flush()
 
-def print_json(string):
+def print_json(string, remove_common_attrs=False):
     '''
     format and print given json string.
     '''
-    j = json.loads(string)
-    print(json.dumps(j, indent=2))
+    data = json.loads(string)
+    if remove_common_attrs:
+        for attr in COMMON_KEYS:
+            data.pop(attr, None)
+    print(json.dumps(data, indent=2))
 
-def poke(cmd, tag):
+def poke(cmd, tag, remove_common_attrs=True):
     '''
     poke the CP / PD so it will process the command.
     '''
+
+    if re.match(r'^[\w\s_-]+$', cmd):
+        cmd = json.dumps({"command": cmd})
+
     try:
         json.loads(cmd)
     except Exception as ex:
-        print('invalid json supplied. check your input.')
+        print('invalid json supplied. check your input (%s)' % cmd)
         raise ex
 
     # prepare command
@@ -87,22 +110,30 @@ def poke(cmd, tag):
 
     print("Got reply: ", end='')
     with open(result_path, 'r') as file:
-        print_json(file.read())
+        print_json(file.read(), remove_common_attrs)
 
 def main():
     '''
     main function
     '''
     parser = argparse.ArgumentParser()
-    parser.add_argument("type",
-                        help="""
+    parser.add_argument("type", help="""
         CP / PD / MON; will write to 'tmp/command_[type].json'
     """)
-    parser.add_argument("command",
-                        help="""
+    parser.add_argument("command", help="""
         command json file, or '-' to read from stdin.
-        If is a simple string (matches \\w) then it will wrap to a json.
+
+        Otherwise, if the file does not exist, it will try to fix it:
+
+        If it seems to be a valid command name,
+        it will try to wrap it to a valid command json without parameter;
+
+        Then it will try to parse it as a json to see if it works;
+        If none of above worked, it will raise an exception.
     """)
+    parser.add_argument('--remove-common-keys', help="""
+        Remove common key to help exam the response.
+    """, dest='remove_common_attrs', type=str, default=True)
 
     args = parser.parse_args()
 
@@ -111,10 +142,14 @@ def main():
         print("hit enter then ctrl-d to commit your command. arrow key does not work.")
         cmd = sys.stdin.read()
     else:
-        with open(args.command, 'r') as file:
-            cmd = file.read()
+        if file_exists(args.command):
+            with open(args.command, 'r') as file:
+                cmd = file.read()
+        else:
+            cmd = args.command
 
-    poke(cmd, args.type)
+    remove_common_attrs = args.remove_common_attrs != 'False' and args.remove_common_attrs != 'false'
+    poke(cmd, args.type, remove_common_attrs)
 
 if __name__ == "__main__":
     main()
