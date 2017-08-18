@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+
+import sys
+import argparse
+import socket
+import os
+import time
+import json
+
+def print_erasable(s):
+    sys.stderr.write(s + '\r')
+    sys.stderr.flush()
+
+def delete_file(f):
+    if os.path.exists(f):
+        os.unlink(f)
+
+def clear_line():
+    print('\033[2K', end='')
+    sys.stdout.flush()
+
+def print_json(s):
+    j = json.loads(s)
+    print(json.dumps(j, indent=2))
+
+def poke(cmd, type):
+    try:
+        json.loads(cmd)
+    except Exception as ex:
+        print('invalid json supplied. check your input.')
+        raise ex
+
+    # prepare command
+    print_erasable("writing command...")
+    cmd_path = './tmp/command_%s.json' % type
+    delete_file(cmd_path)
+    with open(cmd_path, 'w') as f:
+        f.write(cmd)
+    clear_line()
+    print("Wrote command: ", end='')
+    print_json(cmd)
+
+    # poke so it knows it need to execute command
+    result_path = './tmp/result_%s' % type
+    delete_file(result_path)
+
+    socket_path = './tmp/socket_%s' % type
+    s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    s.connect(socket_path)
+    s.send(bytes('< poke >', 'utf-8'))
+
+    print_erasable("waiting for result...")
+    counter = 10
+    while not os.path.exists(result_path):
+        if counter == 0:
+            clear_line()
+            print("wait timeout, did it crash?")
+            return
+        time.sleep(0.3)
+        counter -= 1
+
+    clear_line()
+
+    print("Got reply: ", end='')
+    with open(result_path, 'r') as f:
+        print_json(f.read())
+
+
+def main(argv):
+    parser = argparse.ArgumentParser()
+    parser.add_argument("type",    help="CP / PD / MON; will write to 'tmp/command_[type].json'")
+    parser.add_argument("command", help="command json file, or '-' to read from stdin.")
+
+    args = parser.parse_args()
+
+    cmd = ''
+    if args.command == '-':
+        print("hit enter then ctrl-d to commit your command. arrow key does not work.")
+        cmd = sys.stdin.read()
+    else:
+        with open(args.command, 'r') as f:
+            cmd = f.read()
+
+    poke(cmd, args.type)
+
+if __name__ == "__main__":
+    main(sys.argv)
