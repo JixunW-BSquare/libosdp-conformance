@@ -283,14 +283,15 @@ int
     switch (command)
     {
     default:
-      status = ST_OSDP_BAD_COMMAND_REPLY;
       m->data_payload = m->cmd_payload + 1;
       if (ctx->verbosity > 2)
         strcpy (tlogmsg2, "\?\?\?");
 
       // if we don't recognize the command/reply code it fails 2-15-1
       osdp_conformance.CMND_REPLY.test_status = OCONFORM_FAIL;
+#if TEST_2_15_1
       SET_FAIL (ctx, "2-15-1");
+#endif
       break;
 
     case OSDP_ACK:
