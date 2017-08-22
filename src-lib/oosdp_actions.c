@@ -793,6 +793,7 @@ int
   memset (tlogmsg, 0, sizeof (tlogmsg));
   strncpy (tlogmsg, (char *)(msg->data_payload+6), text_length);
   fprintf (ctx->log, "Text: %s\n", tlogmsg);
+  printf("recv osdp_TEXT: %s\n", tlogmsg);
 
   // we always ack the TEXT command regardless of param errors
 
