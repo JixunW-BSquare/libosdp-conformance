@@ -71,13 +71,17 @@ void print_data(const char* title, uint8_t* data, size_t len, bool header, bool 
 int main(const int argc, const char* argv[]) {
     auto len = argc - 1;
     if (len == 0) {
+        printf("A tool to sign given bytes and output as a json command (for debug only)\n\n");
         printf("usage: %s [byte 1] [byte 2] ...\n", argv[0]);
+        printf("output: { \"command\", \"send_buffer\", \"buffer\": [ ... ] }\n");
         return 0;
     }
     uint8_t* data = new uint8_t[len + 2];
-    auto ptr = data;
+    uint8_t* ptr = data;
     for (int i = 1; i < argc; i++) {
-        sscanf(argv[i], "%02x", ptr);
+        uint32_t tmp;
+        sscanf(argv[i], "%02x", &tmp);
+        *ptr = tmp & 0xFF;
         ptr++;
     }
 
