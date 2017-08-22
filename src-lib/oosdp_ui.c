@@ -50,7 +50,9 @@ int
   OSDP_CONTEXT
      *context,
   char
-    *details)
+    *details,
+  OSDP_COMMAND
+    *cmd)
 
 { /* process_command */
 
