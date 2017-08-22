@@ -866,13 +866,10 @@ int send_comset(OSDP_CONTEXT* ctx,
 */
 
 int send_message(OSDP_CONTEXT* context,
-    int
-        command,
-    int
-        dest_addr,
+    int command,
+    int dest_addr,
     int* current_length,
-    int
-        data_length,
+    int data_length,
     unsigned char* data)
 { /* send_message */
 
