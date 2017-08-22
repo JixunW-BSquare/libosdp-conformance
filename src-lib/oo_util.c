@@ -190,7 +190,7 @@ int osdp_build_message(unsigned char* buf,
 void send_text(OSDP_CONTEXT* ctx, char* str, int dest_addr) {
     int length;
     int str_size = strlen(str);
-    int size = 5 + str_size;
+    int size = 6 + str_size;
     char* data = (char*) malloc(size);
     
     data[0] = 0; // Reader Number
@@ -219,6 +219,10 @@ int osdp_check_command_reply(int role, int command, OSDP_MSG* m, char* tlogmsg2)
                 fprintf(stderr, "hmmm might be unknown command to PD\n");
 
             // can't really check here because of that switch statement after the call, hasn't all been migrated here.
+            break;
+        
+        case OSDP_TEXT:
+            printf("let command go through...\n");
             break;
 
         case OSDP_CHLNG:
