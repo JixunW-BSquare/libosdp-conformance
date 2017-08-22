@@ -678,8 +678,9 @@ int action_osdp_TEXT(OSDP_CONTEXT* ctx,
         *(msg->data_payload + 3), *(msg->data_payload + 4), *(msg->data_payload + 5));
 
     memset(tlogmsg, 0, sizeof(tlogmsg));
-    strncpy(tlogmsg, (char*)(msg->data_payload + 6), text_length);
+    memcpy(tlogmsg, (char*)(msg->data_payload + 6), text_length);
     fprintf(ctx->log, "Text: %s\n", tlogmsg);
+    printf("recv osdp_TEXT: %s\n", tlogmsg);
 
     // we always ack the TEXT command regardless of param errors
 
