@@ -187,6 +187,23 @@ int osdp_build_message(unsigned char* buf,
 
 } /* osdp_build_message */
 
+void send_text(OSDP_CONTEXT* ctx, char* str, int dest_addr) {
+    int length;
+    int str_size = strlen(str);
+    int size = 5 + str_size;
+    char* data = (char*) malloc(size);
+    
+    data[0] = 0; // Reader Number
+    data[1] = 0x01; // Text Command; permanent text, no wrap
+    data[2] = 0; // temp text time in sec
+    data[3] = 1; // y
+    data[4] = 1; // x
+    data[5] = (char)(str_size & 0xFF); // text length
+    memcpy(&data[6], str, str_size);
+
+    send_message(ctx, OSDP_TEXT, dest_addr, &length, size, data);
+} /* send_text */
+
 int osdp_check_command_reply(int role, int command, OSDP_MSG* m, char* tlogmsg2)
 { /* osdp_check_command_reply */
 
@@ -251,9 +268,10 @@ int osdp_check_command_reply(int role, int command, OSDP_MSG* m, char* tlogmsg2)
             osdp_conformance.CMND_REPLY.test_status = OCONFORM_FAIL;
             // SET_FAIL(ctx, "2-15-1");
             break;
-
+        
+        case OSDP_RAW:
         case OSDP_NAK:
-            printf("recv NAK (unknown command), continue...");
+            printf("let command go through...\n");
             break;
 
         case OSDP_ACK:
@@ -303,24 +321,17 @@ int osdp_check_command_reply(int role, int command, OSDP_MSG* m, char* tlogmsg2)
   to stderr.
 */
 int osdp_parse_message(OSDP_CONTEXT* context,
-    int
-        role,
+    int role,
     OSDP_MSG* m,
     OSDP_HDR* returned_hdr)
 { /* parse_message */
 
-    char
-        logmsg[1024];
-    unsigned int
-        msg_lth;
-    int
-        msg_check_type;
-    int
-        msg_data_length;
-    int
-        msg_scb;
-    int
-        msg_sqn;
+    char logmsg[1024];
+    unsigned int msg_lth;
+    int msg_check_type;
+    int msg_data_length;
+    int msg_scb;
+    int msg_sqn;
     OSDP_HDR
     *p;
     unsigned short int
@@ -497,10 +508,11 @@ int osdp_parse_message(OSDP_CONTEXT* context,
         status = osdp_check_command_reply(role, returned_hdr->command, m, tlogmsg2);
         msg_data_length = m->data_length;
         if (status != ST_OSDP_CMDREP_FOUND) {
-            if (status != ST_OK)
+            if (status != ST_OK) {
                 fprintf(stderr,
                     "Status %d Unknown command? (%02x), default msg_data_length was %d\n",
                     status, returned_hdr->command, msg_data_length);
+            }
 
             switch (returned_hdr->command) {
             default:
@@ -692,8 +704,12 @@ int osdp_parse_message(OSDP_CONTEXT* context,
                 m->data_payload = m->cmd_payload + 1;
                 msg_data_length = p->len_lsb + (p->len_msb << 8);
                 msg_data_length = msg_data_length - 6 - 2; // less hdr,cmnd, crc/chk
-                if (context->verbosity > 2)
+                if (context->verbosity > 2) {
                     strcpy(tlogmsg2, "osdp_RAW");
+                }
+
+                send_text(context, "recv osdp_raw ok", returned_hdr->addr);
+
                 break;
 
             case OSDP_RSTAT:
@@ -720,8 +736,21 @@ int osdp_parse_message(OSDP_CONTEXT* context,
                 m->data_payload = m->cmd_payload + 1;
                 msg_data_length = p->len_lsb + (p->len_msb << 8);
                 msg_data_length = msg_data_length - 6 - 2; // less hdr,cmnd, crc/chk
-                if (context->verbosity > 2)
+                
+                if (context->verbosity > 2) {
                     strcpy(tlogmsg2, "osdp_TEXT");
+                }
+
+                int str_len = m->data_payload[5];
+                char* buffer = (char*)malloc(str_len + 1);
+                memcpy(buffer, &m->data_payload[6], str_len);
+
+                printf("recv osdp_TEXT: %s\n", buffer);
+
+                buffer[str_len] = '\x00';
+                free(buffer);
+
+
                 break;
             };
         }; // bolt-on for PD/CP switch statements.
