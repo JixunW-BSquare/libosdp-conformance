@@ -1,3 +1,7 @@
+all: debug
+
+clean:
+	rm -rf build-debug
 
 debug:
 	mkdir -p build-debug
