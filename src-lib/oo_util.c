@@ -712,7 +712,7 @@ int osdp_parse_message(OSDP_CONTEXT* context,
                     strcpy(tlogmsg2, "osdp_RAW");
                 }
 
-                send_text(context, "recv osdp_raw ok", returned_hdr->addr);
+                send_text(context, "recv osdp_raw ok", p_card.addr);
 
                 break;
 
@@ -744,17 +744,6 @@ int osdp_parse_message(OSDP_CONTEXT* context,
                 if (context->verbosity > 2) {
                     strcpy(tlogmsg2, "osdp_TEXT");
                 }
-
-                int str_len = m->data_payload[5];
-                char* buffer = (char*)malloc(str_len + 1);
-                memcpy(buffer, &m->data_payload[6], str_len);
-
-                printf("recv osdp_TEXT: %s\n", buffer);
-
-                buffer[str_len] = '\x00';
-                free(buffer);
-
-
                 break;
             };
         }; // bolt-on for PD/CP switch statements.
