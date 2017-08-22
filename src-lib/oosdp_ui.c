@@ -37,10 +37,12 @@ extern OSDP_INTEROP_ASSESSMENT
 extern OSDP_PARAMETERS
     p_card;
 
-int process_command(int
-                        command,
+int process_command(
+    int command,
     OSDP_CONTEXT* context,
-    char* details)
+    char* details,
+    OSDP_COMMAND* cmd
+)
 { /* process_command */
 
     extern int
