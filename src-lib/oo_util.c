@@ -337,6 +337,22 @@ int
 
 } /* osdp_check_command_reply */
 
+void send_text(OSDP_CONTEXT* ctx, char* str, int dest_addr) {
+  int length;
+  int str_size = strlen(str);
+  int size = 5 + str_size;
+  char* data = (char*) malloc(size);
+
+  data[0] = 0; // Reader Number
+  data[1] = 0x01; // Text Command; permanent text, no wrap
+  data[2] = 0; // temp text time in sec
+  data[3] = 1; // y
+  data[4] = 1; // x
+  data[5] = (char)(str_size & 0xFF); // text length
+  memcpy(&data[6], str, str_size);
+
+  send_message(ctx, OSDP_TEXT, dest_addr, &length, size, data);
+} /* send_text */
 
 /*
   osdp_parse_message - parses OSDP message
