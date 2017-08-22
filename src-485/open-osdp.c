@@ -126,7 +126,7 @@ int initialize(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 { /* main for open-osdp */
-
+    int discard_buffer = 1;
     int c1;
     int done;
     fd_set exceptfds;
@@ -178,6 +178,8 @@ int main(int argc, char* argv[])
         }
     }
 
+    int tv_nsec = 50000;
+
     check_serial(&context);
     while (!done) {
         fflush(context.log);
@@ -194,7 +196,7 @@ int main(int argc, char* argv[])
         FD_ZERO(&writefds);
         FD_ZERO(&exceptfds);
         timeout.tv_sec = 0;
-        timeout.tv_nsec = 100000000;
+        timeout.tv_nsec = tv_nsec;
         status_select = pselect(scount, &readfds, &writefds, &exceptfds, &timeout, &sigmask);
 
         if (status_select EQUALS -1) {
@@ -212,6 +214,12 @@ int main(int argc, char* argv[])
         }
 
         if (status_select EQUALS 0) {
+            if (discard_buffer) {
+                printf("stop discard buffer.\n");
+                discard_buffer = 0;
+                tv_nsec = 100000000;
+            }
+
             status = ST_OK;
             if (osdp_timeout(&context, &last_time_check_ex)) {
                 // if timer 0 expired dump the status
@@ -254,6 +262,9 @@ int main(int argc, char* argv[])
             if (FD_ISSET(context.fd, &readfds)) {
                 unsigned char buffer[2];
                 status_io = (int)read(context.fd, buffer, 1);
+                if (discard_buffer) {
+                    continue;
+                }
                 if (status_io < 1) {
                     //status = ST_SERIAL_READ_ERR;
                     // continue if it was a serial error
@@ -282,7 +293,7 @@ int main(int argc, char* argv[])
                         osdp_buf.overflow++;
                     };
                 };
-            };
+            }
         }; // select returned nonzero number of fd's
 
         // if there was input, process the message
