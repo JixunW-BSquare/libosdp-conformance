@@ -340,7 +340,7 @@ int
 void send_text(OSDP_CONTEXT* ctx, char* str, int dest_addr) {
   int length;
   int str_size = strlen(str);
-  int size = 5 + str_size;
+  int size = 6 + str_size;
   char* data = (char*) malloc(size);
 
   data[0] = 0; // Reader Number
