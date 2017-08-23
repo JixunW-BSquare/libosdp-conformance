@@ -22,7 +22,7 @@
 #include <memory.h>
 #include <stdio.h>
 
-#include <aes.h>
+#include <tinyaes/aes.h>
 
 #include <open-osdp.h>
 
