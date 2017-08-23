@@ -44,3 +44,9 @@ link_libraries(osdp)
 add_executable(open-osdp ${SOURCE_FILES})
 
 add_custom_target(buildtest ./test.sh)
+
+# Install to system
+install(TARGETS osdp DESTINATION lib)
+install(TARGETS open-osdp DESTINATION bin)
+install(TARGETS osdp-sign DESTINATION bin)
+install(FILES ${COMMON_HEADER_FILES} DESTINATION include/${PROJECT_NAME})
