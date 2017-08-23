@@ -53,4 +53,4 @@ install(TARGETS osdp-sign DESTINATION bin)
 install(FILES poke DESTINATION bin RENAME osdp-poke)
 install(FILES ${COMMON_HEADER_FILES} DESTINATION include/${PROJECT_NAME})
 
-add_custom_target(buildtest COMMAND osdp-diag-01)
+add_custom_target(buildtest COMMAND ./osdp-diag-01)
