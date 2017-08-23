@@ -18,6 +18,14 @@
   Support provided by the Security Industry Association
   http://www.securityindustry.org
 */
+#pragma once
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "open-osdp.h"
+
 #define OCONFORM_UNTESTED     (0)
 #define OCONFORM_EXERCISED    (1)
 #define OCONFORM_EX_GOOD_ONLY (2)
@@ -180,4 +188,8 @@ int
   osdp_conform_fail
     (char
       *test);
+
+#ifdef __cplusplus
+}
+#endif
 

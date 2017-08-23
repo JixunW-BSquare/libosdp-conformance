@@ -20,8 +20,19 @@
 */
 
 
-#define max(a, b)  ( a > b ? a : b )
-#define min(a, b)  ( a < b ? a : b )
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+#ifndef max
+#define max(a, b) (a > b ? a : b)
+#endif
+
+#ifndef min
+#define min(a, b) (a < b ? a : b)
+#endif
+
 
 #ifdef ENABLE_WEB_RPC
 #undef ENABLE_WEB_RPC
@@ -836,4 +847,9 @@ int send_secure_message (OSDP_CONTEXT *context, int command, int dest_addr,
 void signal_callback_handler (int signum);
 unsigned short int fCrcBlk (unsigned char *pData, unsigned short int nLength);
 int write_status (OSDP_CONTEXT *ctx);
+
+
+#ifdef __cplusplus
+}
+#endif
 
