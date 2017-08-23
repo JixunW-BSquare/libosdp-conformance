@@ -32,7 +32,7 @@ set(SOURCE_FILES
 
 
 # Build sign.
-add_executable(sign src-cli/sign.cpp)
+add_executable(osdp-sign src-cli/sign.cpp)
 
 # Build libosdp
 link_libraries(tinyaes)
