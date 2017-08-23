@@ -1494,3 +1494,21 @@ int process_osdp_message(OSDP_CONTEXT* context,
   return (status);
 
 } /* process_osdp_message */
+
+int send_osdp_data(OSDP_CONTEXT* context, unsigned char* buf, int lth)
+{ /* send_osdp_data */
+
+    if (context->verbosity > 9) {
+        int idx;
+
+        fprintf(stderr, "\nRaw:");
+        for (idx = 0; idx < lth; idx++) {
+            fprintf(stderr, " %02x", buf[idx]);
+        };
+        fprintf(stderr, "\n");
+    };
+    write(context->fd, buf, lth);
+
+    return (ST_OK);
+
+} /* send_osdp_data */

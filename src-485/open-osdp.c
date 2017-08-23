@@ -40,7 +40,6 @@ OSDP_CONTEXT context;
 struct timespec last_time_check_ex;
 OSDP_BUFFER osdp_buf;
 OSDP_INTEROP_ASSESSMENT osdp_conformance;
-OSDP_OUT_CMD current_output_command[16];
 OSDP_PARAMETERS p_card;
 char tag[8]; // PD or CP as a string
 
@@ -313,21 +312,3 @@ int main(int argc, char* argv[])
     return (status);
 
 } /* main for open-osdp */
-
-int send_osdp_data(OSDP_CONTEXT* context, unsigned char* buf, int lth)
-{ /* send_osdp_data */
-
-    if (context->verbosity > 9) {
-        int idx;
-
-        fprintf(stderr, "\nRaw:");
-        for (idx = 0; idx < lth; idx++) {
-            fprintf(stderr, " %02x", buf[idx]);
-        };
-        fprintf(stderr, "\n");
-    };
-    write(context->fd, buf, lth);
-
-    return (ST_OK);
-
-} /* send_osdp_data */
