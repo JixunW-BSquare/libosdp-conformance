@@ -6,9 +6,9 @@
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
- 
+
     http://www.apache.org/licenses/LICENSE-2.0
- 
+
   Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,8 +21,13 @@
 
 #pragma once
 
-#define max(a, b)  ( a > b ? a : b )
-#define min(a, b)  ( a < b ? a : b )
+#ifndef max
+#define max(a, b) (a > b ? a : b)
+#endif
+
+#ifndef min
+#define min(a, b) (a < b ? a : b)
+#endif
 
 #ifdef ENABLE_WEB_RPC
 #undef ENABLE_WEB_RPC
@@ -62,7 +67,7 @@
 
 // OSDP defined constants
 #define C_SOM (0x53)
-#define C_OSDP_MARK (0xff) // used in OSDP TLS to poke CP
+#define C_OSDP_MARK (0xff)  // used in OSDP TLS to poke CP
 
 #define OSDP_CONFIGURATION_ADDRESS (0x7F)
 
@@ -75,9 +80,10 @@
 #define OSDP_SEC_SCS_13 (0x13)
 #define OSDP_SEC_SCS_14 (0x14)
 
-#define OSDP_KEY_OCTETS (16) // AES-128 CBC
+#define OSDP_KEY_OCTETS (16)  // AES-128 CBC
 
-#define OSDP_SCBK_DEFAULT "\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x3A\x3B\x3C\x3D\x3E\x3F"
+#define OSDP_SCBK_DEFAULT \
+  "\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x3A\x3B\x3C\x3D\x3E\x3F"
 
 // for Secure Channel
 #define OSDP_KEY_SIZE (128)
@@ -123,7 +129,7 @@
 #define OSDP_CCRYPT (0x76)
 #define OSDP_SCRYPT (0x77)
 #define OSDP_RMAC_I (0x78)
-#define OSDP_BUSY (0x79) // yes it's a reply
+#define OSDP_BUSY (0x79)  // yes it's a reply
 #define OSDP_MFGREP (0x90)
 
 // NAK error codes
@@ -203,35 +209,22 @@
 
 // for secure channel
 typedef struct osdp_secure_message {
-    unsigned char
-        som;
-    unsigned char
-        addr;
-    unsigned char
-        len_lsb;
-    unsigned char
-        len_msb;
-    unsigned char
-        ctrl;
-    unsigned char
-        sec_blk_len;
-    unsigned char
-        sec_blk_type;
-    unsigned char
-        sec_blk_data;
-    unsigned char
-        cmd_reply;
-    unsigned char
-        data_start;
+  unsigned char som;
+  unsigned char addr;
+  unsigned char len_lsb;
+  unsigned char len_msb;
+  unsigned char ctrl;
+  unsigned char sec_blk_len;
+  unsigned char sec_blk_type;
+  unsigned char sec_blk_data;
+  unsigned char cmd_reply;
+  unsigned char data_start;
 } OSDP_SECURE_MESSAGE;
 
 typedef struct osdp_sc_ccrypt {
-    unsigned char
-        client_id[8];
-    unsigned char
-        rnd_b[8];
-    unsigned char
-        cryptogram[16];
+  unsigned char client_id[8];
+  unsigned char rnd_b[8];
+  unsigned char cryptogram[16];
 } OSDP_SC_CCRYPT;
 
 #define OSDP_OUT_NOP (0)
@@ -243,216 +236,138 @@ typedef struct osdp_sc_ccrypt {
 #define OSDP_OUT_OFF_TEMP_TIMEOUT (6)
 
 typedef struct osdp_out_cmd {
-    int
-        output_number;
-    int
-        control_code;
-    unsigned int
-        timer;
+  int output_number;
+  int control_code;
+  unsigned int timer;
 } OSDP_OUT_CMD;
 
 typedef struct osdp_out_msg {
-    unsigned char
-        output_number;
-    unsigned char
-        control_code;
-    unsigned char
-        timer_lsb;
-    unsigned char
-        timer_msb;
+  unsigned char output_number;
+  unsigned char control_code;
+  unsigned char timer_lsb;
+  unsigned char timer_msb;
 } OSDP_OUT_MSG;
 
 typedef struct osdp_out_state {
-    unsigned int
-        timer;
-    int
-        current;
-    int
-        permanent;
+  unsigned int timer;
+  int current;
+  int permanent;
 } OSDP_OUT_STATE;
 #define OSDP_MAX_OUT (16)
 
 typedef struct osdp_led_state {
-    int
-        state;
-    unsigned int
-        web_color;
+  int state;
+  unsigned int web_color;
 } OSDP_LED_STATE;
 #define OSDP_MAX_LED (256)
 #define OSDP_LED_ACTIVATED (1)
 #define OSDP_LED_DEACTIVATED (0)
 
 typedef struct osdp_timer {
-    time_t
-        i_sec;
-    long
-        i_nsec;
-    time_t
-        current_seconds;
-    long
-        current_nanoseconds;
-    int
-        status;
+  time_t i_sec;
+  long i_nsec;
+  time_t current_seconds;
+  long current_nanoseconds;
+  int status;
 } OSDP_TIMER;
 // possible values for status
 #define OSDP_TIMER_RUNNING (0)
 #define OSDP_TIMER_RESTARTED (1)
 
 typedef struct osdp_context {
-    // configuration
-    int
-        disable_certificate_checking;
-    int
-        enable_secure_channel; // 1=yes, 2=yes and use default
-    char
-        fqdn[1024];
-    char
-        log_path[1024];
-    char
-        serial_speed[1024];
-    int
-        verbosity;
+  // configuration
+  int disable_certificate_checking;
+  int enable_secure_channel;  // 1=yes, 2=yes and use default
+  char fqdn[1024];
+  char log_path[1024];
+  char serial_speed[1024];
+  int verbosity;
 
-    // IO context
-    int
-        current_pid;
-    int
-        fd;
-    FILE* log;
-    char
-        network_address[1024];
-    FILE* report;
-    struct termios
-        tio;
+  // IO context
+  int current_pid;
+  int fd;
+  FILE* log;
+  char network_address[1024];
+  FILE* report;
+  struct termios tio;
 
-    // UI context
-    int
-        current_menu;
+  // UI context
+  int current_menu;
 
-    // CP and PD context
-    OSDP_LED_STATE
-    led[OSDP_MAX_LED];
-    int
-        role;
-    char
-        text[1024];
+  // CP and PD context
+  OSDP_LED_STATE
+  led[OSDP_MAX_LED];
+  int role;
+  char text[1024];
 
-    // OSDP protocol context
-    char
-        last_command_sent;
-    char
-        last_nak_error;
-    char
-        last_response_received;
-    char
-        next_response;
-    int
-        next_sequence;
+  // OSDP protocol context
+  char last_command_sent;
+  char last_nak_error;
+  char last_response_received;
+  char next_response;
+  int next_sequence;
 
-    // secure channel
-    unsigned char
-        current_received_mac[OSDP_KEY_OCTETS];
-    unsigned char
-        current_scbk[OSDP_KEY_OCTETS];
-    unsigned char
-        rnd_a[8];
-    unsigned char
-        rnd_b[8];
-    unsigned char
-        s_enc[16];
-    unsigned char
-        s_mac1[16];
-    unsigned char
-        s_mac2[16];
-    int
-        secure_channel_use[4]; // see OO_SCU_... use
+  // secure channel
+  unsigned char current_received_mac[OSDP_KEY_OCTETS];
+  unsigned char current_scbk[OSDP_KEY_OCTETS];
+  unsigned char rnd_a[8];
+  unsigned char rnd_b[8];
+  unsigned char s_enc[16];
+  unsigned char s_mac1[16];
+  unsigned char s_mac2[16];
+  int secure_channel_use[4];  // see OO_SCU_... use
 
-    char
-        new_address;
-    char
-        test_in_progress[32];
-    int
-        profile;
-    int
-        timer_count;
-    OSDP_TIMER
-    timer[2];
-    int
-        last_errno;
-    int
-        tamper;
-    int
-        power_report;
-    int
-        card_data_valid;
-    int
-        creds_a_avail;
-    int
-        bytes_received;
-    int
-        bytes_sent;
-    int
-        packets_received;
-    int
-        cp_polls;
-    int
-        pd_acks;
-    int
-        sent_naks;
-    int
-        checksum_errs;
-    char
-        init_command[1024];
-    int
-        cparm;
-    int
-        cparm_v;
-    unsigned char
-        vendor_code[3];
-    unsigned char
-        model;
-    unsigned char
-        version;
-    unsigned char
-        serial_number[4];
-    unsigned char
-        fw_version[3]; //major minor build
+  char new_address;
+  char test_in_progress[32];
+  int profile;
+  int timer_count;
+  OSDP_TIMER
+  timer[2];
+  int last_errno;
+  int tamper;
+  int power_report;
+  int card_data_valid;
+  int creds_a_avail;
+  int bytes_received;
+  int bytes_sent;
+  int packets_received;
+  int cp_polls;
+  int pd_acks;
+  int sent_naks;
+  int checksum_errs;
+  char init_command[1024];
+  int cparm;
+  int cparm_v;
+  unsigned char vendor_code[3];
+  unsigned char model;
+  unsigned char version;
+  unsigned char serial_number[4];
+  unsigned char fw_version[3];  // major minor build
 
-    int
-        max_message; // max message from PD, if set
+  int max_message;  // max message from PD, if set
 
-    // for multipart messages, in or out
-    char* mmsgbuf;
-    unsigned short int
-        total_len;
+  // for multipart messages, in or out
+  char* mmsgbuf;
+  unsigned short int total_len;
 
-    // for assembling multipart message.  assumes one context structure
-    // per PD we talk to
-    unsigned short int
-        next_in;
+  // for assembling multipart message.  assumes one context structure
+  // per PD we talk to
+  unsigned short int next_in;
 
-    // for transmitting multi-part
-    unsigned short int
-        next_out;
-    int
-        authenticated;
-    char command_path[1024];
-    int
-        cmd_hist_counter;
-    char
-        init_parameters_path[1024];
+  // for transmitting multi-part
+  unsigned short int next_out;
+  int authenticated;
+  char command_path[1024];
+  int cmd_hist_counter;
+  char init_parameters_path[1024];
 
-    OSDP_OUT_STATE
-    out[16];
+  OSDP_OUT_STATE
+  out[16];
 
-    int
-        last_raw_read_bits;
-    int
-        slow_timer;
-    char
-        last_raw_read_data[1024];
-    char
-        last_keyboard_data[8];
+  int last_raw_read_bits;
+  int slow_timer;
+  char last_raw_read_data[1024];
+  char last_keyboard_data[8];
 } OSDP_CONTEXT;
 
 #define OO_SCU_ENAB (0)
@@ -482,26 +397,20 @@ typedef struct osdp_context {
 #define OSDP_CRC (1)
 
 typedef struct osdp_parameters {
-    // card response
+  // card response
 
-    int
-        bits;
-    unsigned char
-        value[1024];
-    int
-        value_len;
+  int bits;
+  unsigned char value[1024];
+  int value_len;
 
-    // PD device address
-    int
-        addr;
+  // PD device address
+  int addr;
 
-    //  Serial device filename
-    char
-        filename[1024];
+  //  Serial device filename
+  char filename[1024];
 
-    // poll delay
-    int
-        poll;
+  // poll delay
+  int poll;
 } OSDP_PARAMETERS;
 #define PARAMETER_NONE (0)
 #define PARAMETER_PARAMS (1)
@@ -529,68 +438,43 @@ typedef struct osdp_parameters {
 
 #define OSDP_BUF_MAX (8192)
 typedef struct osdp_buffer {
-    unsigned char
-        buf[OSDP_BUF_MAX];
-    int
-        next;
-    int
-        overflow;
+  unsigned char buf[OSDP_BUF_MAX];
+  int next;
+  int overflow;
 } OSDP_BUFFER;
 
 typedef struct osdp_command {
-    int command;
-    unsigned char details[128];
-    size_t payload_length;
+  int command;
+  unsigned char details[128];
+  size_t payload_length;
 } OSDP_COMMAND;
 
-typedef struct osdp_param {
-    char device[1024];
-} OSDP_PARAM;
+typedef struct osdp_param { char device[1024]; } OSDP_PARAM;
 
 typedef struct osdp_hdr {
-    unsigned char
-        som;
-    unsigned char
-        addr;
-    unsigned char
-        len_lsb;
-    unsigned char
-        len_msb;
-    unsigned char
-        ctrl;
-    unsigned char
-        command;
+  unsigned char som;
+  unsigned char addr;
+  unsigned char len_lsb;
+  unsigned char len_msb;
+  unsigned char ctrl;
+  unsigned char command;
 } OSDP_HDR;
 
 typedef struct osdp_rdr_led_ctl {
-    unsigned char
-        reader;
-    unsigned char
-        led;
-    unsigned char
-        temp_control;
-    unsigned char
-        temp_on;
-    unsigned char
-        temp_off;
-    unsigned char
-        temp_on_color;
-    unsigned char
-        temp_off_color;
-    unsigned char
-        temp_timer_lsb;
-    unsigned char
-        temp_timer_msb;
-    unsigned char
-        perm_control;
-    unsigned char
-        perm_on_time;
-    unsigned char
-        perm_off_time;
-    unsigned char
-        perm_on_color;
-    unsigned char
-        perm_off_color;
+  unsigned char reader;
+  unsigned char led;
+  unsigned char temp_control;
+  unsigned char temp_on;
+  unsigned char temp_off;
+  unsigned char temp_on_color;
+  unsigned char temp_off_color;
+  unsigned char temp_timer_lsb;
+  unsigned char temp_timer_msb;
+  unsigned char perm_control;
+  unsigned char perm_on_time;
+  unsigned char perm_off_time;
+  unsigned char perm_on_color;
+  unsigned char perm_off_color;
 } OSDP_RDR_LED_CTL;
 
 #define OSDP_LED_TEMP_NOP (0)
@@ -606,65 +490,42 @@ typedef struct osdp_rdr_led_ctl {
 #define OSDP_LEDCOLOR_BLUE (4)
 
 typedef struct osdp_text_hdr {
-    unsigned char
-        reader;
-    unsigned char
-        tc;
-    unsigned char
-        tsec;
-    unsigned char
-        row;
-    unsigned char
-        col;
-    unsigned char
-        length;
-    char
-        text[1024];
+  unsigned char reader;
+  unsigned char tc;
+  unsigned char tsec;
+  unsigned char row;
+  unsigned char col;
+  unsigned char length;
+  char text[1024];
 } OSDP_TEXT_HEADER;
 
 typedef struct osdp_msg {
-    unsigned int
-        lth;
-    unsigned char* ptr;
-    unsigned char
-        msg_cmd;
-    unsigned char* cmd_payload;
-    unsigned char* data_payload;
-    int
-        data_length;
-    unsigned char* crc_check;
-    int
-        check_size;
+  unsigned int lth;
+  unsigned char* ptr;
+  unsigned char msg_cmd;
+  unsigned char* cmd_payload;
+  unsigned char* data_payload;
+  int data_length;
+  unsigned char* crc_check;
+  int check_size;
 } OSDP_MSG;
 
 typedef struct osdp_multi_getpiv {
-    unsigned char
-        oui[3];
-    unsigned short int
-        total;
-    unsigned short int
-        offset;
-    unsigned short int
-        length;
-    unsigned short int
-        cmd;
-    unsigned char
-        container_tag[8];
-    unsigned char
-        data_tag[8];
+  unsigned char oui[3];
+  unsigned short int total;
+  unsigned short int offset;
+  unsigned short int length;
+  unsigned short int cmd;
+  unsigned char container_tag[8];
+  unsigned char data_tag[8];
 } ZZZOSDP_MULTI_GETPIV;
 
 typedef struct osdp_multi_hdr {
-    unsigned char
-        VendorCode[3];
-    unsigned short int
-        Reply_ID;
-    unsigned short int
-        MpdSizeTotal;
-    unsigned short int
-        MpdOffset;
-    unsigned short int
-        MpdFragmentSize;
+  unsigned char VendorCode[3];
+  unsigned short int Reply_ID;
+  unsigned short int MpdSizeTotal;
+  unsigned short int MpdOffset;
+  unsigned short int MpdFragmentSize;
 } OSDP_MULTI_HDR;
 
 // open-osdp Reply_ID values...
@@ -735,14 +596,10 @@ typedef struct osdp_multi_hdr {
 
 #define ST_BAD_ROLE (101)
 
-int
-    m_version_minor;
-int
-    m_build;
-int
-    m_check;
-int
-    m_dump;
+int m_version_minor;
+int m_build;
+int m_check;
+int m_dump;
 
 int action_osdp_CCRYPT(OSDP_CONTEXT* ctx, OSDP_MSG* msg);
 
@@ -784,22 +641,37 @@ int oosdp_log(OSDP_CONTEXT* context, int logtype, int level, char* message);
 
 int oosdp_make_message(int msgtype, char* logmsg, void* aux);
 
-int osdp_build_message(unsigned char* buf, int* updated_length,
-    unsigned char command, int dest_addr, int sequence, int data_length,
-    unsigned char* data, int security);
+int osdp_build_message(unsigned char* buf,
+                       int* updated_length,
+                       unsigned char command,
+                       int dest_addr,
+                       int sequence,
+                       int data_length,
+                       unsigned char* data,
+                       int security);
 
-int osdp_build_secure_message(unsigned char* buf, int* updated_length,
-    unsigned char command, int dest_addr, int sequence, int data_length,
-    unsigned char* data, int sec_blk_type, int sec_blk_lth,
-    unsigned char* sec_blk);
+int osdp_build_secure_message(unsigned char* buf,
+                              int* updated_length,
+                              unsigned char command,
+                              int dest_addr,
+                              int sequence,
+                              int data_length,
+                              unsigned char* data,
+                              int sec_blk_type,
+                              int sec_blk_lth,
+                              unsigned char* sec_blk);
 
-void osdp_create_client_cryptogram(OSDP_CONTEXT* context, OSDP_SC_CCRYPT* ccrypt_response);
+void osdp_create_client_cryptogram(OSDP_CONTEXT* context,
+                                   OSDP_SC_CCRYPT* ccrypt_response);
 
 void osdp_create_keys(OSDP_CONTEXT* ctx);
 
 int osdp_get_key_slot(OSDP_CONTEXT* ctx, OSDP_MSG* msg, int* key_slot);
 
-int osdp_parse_message(OSDP_CONTEXT* context, int role, OSDP_MSG* m, OSDP_HDR* h);
+int osdp_parse_message(OSDP_CONTEXT* context,
+                       int role,
+                       OSDP_MSG* m,
+                       OSDP_HDR* h);
 
 void osdp_reset_background_timer(OSDP_CONTEXT* ctx);
 
@@ -811,7 +683,10 @@ int osdp_timeout(OSDP_CONTEXT* ctx, struct timespec* last_time_check_ex);
 
 void preserve_current_command(void);
 
-int process_command(int command, OSDP_CONTEXT* context, char* details, OSDP_COMMAND* cmd);
+int process_command(int command,
+                    OSDP_CONTEXT* context,
+                    char* details,
+                    OSDP_COMMAND* cmd);
 
 int process_current_command(void);
 
@@ -827,17 +702,29 @@ int read_config(OSDP_CONTEXT* context);
 
 int send_bio_read_template(OSDP_CONTEXT* ctx);
 
-int send_comset(OSDP_CONTEXT* ctx, unsigned char pd_address, unsigned char new_addr,
-    char* speed_string);
+int send_comset(OSDP_CONTEXT* ctx,
+                unsigned char pd_address,
+                unsigned char new_addr,
+                char* speed_string);
 
-int send_message(OSDP_CONTEXT* context, int command, int dest_addr,
-    int* current_length, int data_length, unsigned char* data);
+int send_message(OSDP_CONTEXT* context,
+                 int command,
+                 int dest_addr,
+                 int* current_length,
+                 int data_length,
+                 unsigned char* data);
 
 int send_osdp_data(OSDP_CONTEXT* ctx, unsigned char* buf, int lth);
 
-int send_secure_message(OSDP_CONTEXT* context, int command, int dest_addr,
-    int* current_length, int data_length, unsigned char* data, int sec_blk_type,
-    int sec_blk_lth, unsigned char* sec_blk);
+int send_secure_message(OSDP_CONTEXT* context,
+                        int command,
+                        int dest_addr,
+                        int* current_length,
+                        int data_length,
+                        unsigned char* data,
+                        int sec_blk_type,
+                        int sec_blk_lth,
+                        unsigned char* sec_blk);
 
 void signal_callback_handler(int signum);
 
