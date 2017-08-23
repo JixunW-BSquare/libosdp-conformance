@@ -21,41 +21,37 @@
 
 #include <open-osdp.h>
 
-extern OSDP_CONTEXT
-    context;
+extern OSDP_CONTEXT context;
 
-int process_current_command(void)
-{ /*process_current_command */
+int process_current_command(void) { /*process_current_command */
 
-    OSDP_COMMAND cmd;
-    int
-        status;
+  OSDP_COMMAND cmd;
+  int status;
 
-    status = read_command(&context, &cmd);
-    if (status EQUALS ST_OK) {
-        status = process_command(cmd.command, &context, (char*)cmd.details, &cmd);
-    };
-    if (status != ST_OK)
-        fprintf(stderr, "process_current_command failed: status %d\n", status);
-    return (status);
+  status = read_command(&context, &cmd);
+  if (status EQUALS ST_OK) {
+    status = process_command(cmd.command, &context, (char*)cmd.details, &cmd);
+  };
+  if (status != ST_OK)
+    fprintf(stderr, "process_current_command failed: status %d\n", status);
+  return (status);
 
 } /*process_current_command */
 
-void preserve_current_command(void)
-{ /* preserve_current_command */
+void preserve_current_command(void) { /* preserve_current_command */
 
-    char command[1024];
-    char preserve[1024];
+  char command[1024];
+  char preserve[1024];
 
-    sprintf(preserve, "%s_%02d", context.command_path, context.cmd_hist_counter);
-    sprintf(command, "chmod 777 %s", context.command_path);
-    system(command);
+  sprintf(preserve, "%s_%02d", context.command_path, context.cmd_hist_counter);
+  sprintf(command, "chmod 777 %s", context.command_path);
+  system(command);
 
-    sprintf(command, "mv %s %s", context.command_path, preserve);
-    system(command);
+  sprintf(command, "mv %s %s", context.command_path, preserve);
+  system(command);
 
-    context.cmd_hist_counter++;
-    if (context.cmd_hist_counter > 99)
-        context.cmd_hist_counter = 0;
+  context.cmd_hist_counter++;
+  if (context.cmd_hist_counter > 99)
+    context.cmd_hist_counter = 0;
 
 } /* preserve_current_command */
