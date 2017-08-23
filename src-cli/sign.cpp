@@ -1,3 +1,16 @@
+/**
+ * sign.cpp - A tool to sign given bytes and output as a json command (for debug only)
+ * usage: ./sign [byte 1] [byte 2] ...
+ *        byte is in hex-representation.
+ * 
+ * Output: {
+ *   "command": "send_buffer",
+ *   "buffer": [ 255, 83, ... ]
+ * }
+ *
+ * (C)Copyright 2017-Present BSquare E.M.E.A.
+*/
+
 #include <stdint.h>
 #include <stdio.h>
 
@@ -73,6 +86,7 @@ int main(const int argc, const char* argv[]) {
     if (len == 0) {
         printf("A tool to sign given bytes and output as a json command (for debug only)\n\n");
         printf("usage: %s [byte 1] [byte 2] ...\n", argv[0]);
+        printf("       byte is in hex-representation.\n");
         printf("output: { \"command\", \"send_buffer\", \"buffer\": [ ... ] }\n");
         return 0;
     }
