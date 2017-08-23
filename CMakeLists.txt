@@ -42,3 +42,5 @@ add_library(osdp SHARED ${LIB_SOURCE_FILES})
 # Build open-osdp
 link_libraries(osdp)
 add_executable(open-osdp ${SOURCE_FILES})
+
+add_custom_target(buildtest ./test.sh)
