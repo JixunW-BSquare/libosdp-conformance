@@ -21,6 +21,11 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #ifndef max
 #define max(a, b) (a > b ? a : b)
 #endif
@@ -731,3 +736,8 @@ void signal_callback_handler(int signum);
 unsigned short int fCrcBlk(unsigned char* pData, unsigned short int nLength);
 
 int write_status(OSDP_CONTEXT* ctx);
+
+
+#ifdef __cplusplus
+}
+#endif

@@ -21,6 +21,11 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include "open-osdp.h"
 
 #define OCONFORM_UNTESTED (0)
@@ -158,3 +163,7 @@ void dump_conformance(OSDP_CONTEXT* ctx, OSDP_INTEROP_ASSESSMENT* oconf);
 int osdp_conform_confirm(char* test);
 
 int osdp_conform_fail(char* test);
+
+#ifdef __cplusplus
+}
+#endif
