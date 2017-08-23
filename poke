@@ -6,7 +6,7 @@ OSDP-Poke
 Use --help to get help.
 Can also be used as a module to poke programmly.
 
-Supportes Python 3.x
+Supports Python 3.x
 '''
 
 import sys
