@@ -16,6 +16,8 @@ Requirement:
   * `yum i jansson` - CentOS
 * CMake/gcc - build project
 
+In case `libtinyaes.so` or `libosdp.so` not found, follow [this guide](https://stackoverflow.com/a/17892806) to add `/usr/local/lib` to library search path.
+
 ## Build
 
 ```
