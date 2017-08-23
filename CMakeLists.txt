@@ -3,7 +3,7 @@ project(libosdp_conformance)
 
 set(CMAKE_CXX_STANDARD 11)
 
-include_directories(include aes src-485 src-lib src-tls src-ui)
+include_directories(include src-485 src-lib src-tls src-ui)
 
 set (COMMON_HEADER_FILES
         include/open-osdp.h
@@ -30,23 +30,27 @@ set(SOURCE_FILES
         src-485/open-osdp.c
         ${COMMON_HEADER_FILES})
 
-
-# Build sign.
-add_executable(osdp-sign src-cli/sign.cpp)
-
 # Build libosdp
 link_libraries(tinyaes)
 link_libraries(jansson)
-add_library(osdp SHARED ${LIB_SOURCE_FILES})
+add_library(osdp
+        SHARED ${LIB_SOURCE_FILES})
 
 # Build open-osdp
 link_libraries(osdp)
 add_executable(open-osdp ${SOURCE_FILES})
 
-add_custom_target(buildtest ./test.sh)
+# Build sign (with tinyaes, jansson, osdp)
+add_executable(osdp-sign src-cli/sign.cpp)
+
+# Build diag01 (with tinyaes, jansson, osdp).
+add_executable(osdp-diag-01 test/diags/diag01.c)
 
 # Install to system
 install(TARGETS osdp DESTINATION lib)
 install(TARGETS open-osdp DESTINATION bin)
 install(TARGETS osdp-sign DESTINATION bin)
+install(FILES poke DESTINATION bin RENAME osdp-poke)
 install(FILES ${COMMON_HEADER_FILES} DESTINATION include/${PROJECT_NAME})
+
+add_custom_target(buildtest COMMAND osdp-diag-01)
