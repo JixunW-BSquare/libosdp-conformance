@@ -29,14 +29,10 @@ to compile in libosdp/test/diag:
 #include <open-osdp.h>
 #include <osdp_conformance.h>
 
-OSDP_INTEROP_ASSESSMENT
-osdp_conformance;
-OSDP_CONTEXT
-context;
-OSDP_BUFFER
-osdp_buf;
-OSDP_PARAMETERS
-p_card;
+OSDP_INTEROP_ASSESSMENT osdp_conformance;
+OSDP_CONTEXT context;
+OSDP_BUFFER osdp_buf;
+OSDP_PARAMETERS p_card;
 int creds_buffer_a_next;
 int creds_buffer_a_lth;
 int creds_buffer_a_remaining;
