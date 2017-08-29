@@ -343,7 +343,7 @@ void send_text(OSDP_CONTEXT* ctx, char* str, int dest_addr) {
   int length;
   int str_size = strlen(str);
   int size = 6 + str_size;
-  char* data = (char*) malloc(size);
+  unsigned char* data = (unsigned char*) malloc(size);
 
   data[0] = 0; // Reader Number
   data[1] = 0x01; // Text Command; permanent text, no wrap
