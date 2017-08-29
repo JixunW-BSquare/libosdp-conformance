@@ -19,6 +19,7 @@
   http://www.securityindustry.org
 */
 
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -573,6 +574,9 @@ typedef struct osdp_command
     command;
   unsigned char
     details [128];
+  unsigned int
+    payload_length;
+  
 } OSDP_COMMAND;
 
 typedef struct osdp_param
@@ -827,7 +831,7 @@ void osdp_reset_secure_channel (OSDP_CONTEXT *ctx);
 int osdp_setup_scbk (OSDP_CONTEXT *ctx, OSDP_MSG *msg);
 int osdp_timeout (OSDP_CONTEXT *ctx, struct timespec * last_time_check_ex);
 void preserve_current_command (void);
-int process_command (int command, OSDP_CONTEXT *context, char *details);
+int process_command (int command, OSDP_CONTEXT *context, char *details, OSDP_COMMAND *cmd);
 int process_current_command (void);
 int process_osdp_input (OSDP_BUFFER *osdpbuf);
 int monitor_osdp_message (OSDP_CONTEXT *context, OSDP_MSG *msg);

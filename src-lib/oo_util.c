@@ -30,6 +30,8 @@
 #include <open-osdp.h>
 #include <osdp_conformance.h>
 
+OSDP_OUT_CMD
+  current_output_command [16];
 
 extern OSDP_CONTEXT
   context;
