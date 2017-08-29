@@ -131,11 +131,14 @@ int
   if (context.role EQUALS OSDP_ROLE_MONITOR)
     strcpy (tag, "MON");
   sprintf (context.command_path,
-    "/opt/osdp-conformance/run/%s/open_osdp_command.json", tag);
+    OSDP_LCL_COMMAND_PATH, tag);
   // initialize my current pid
   my_pid = getpid ();
   sprintf (command, OSPD_LCL_SET_PID_TEMPLATE,
     tag, my_pid);
+  system (command);
+
+  sprintf (command, "mkdir -p \"" OSDP_LCL_SERVER_RESULTS "\"", tag);
   system (command);
 
   if (status EQUALS ST_OK)

@@ -155,8 +155,9 @@ int
   printf ("<META HTTP-EQUIV=\"REFRESH\" CONTENT=\"3;\">");
   printf ("</HEAD><BODY>");
 
+  sprintf(buffer, OSDP_LCL_STATUS_PATH, "PD");
+  sf = fopen (buffer, "r");
   buffer [0] = 0;
-  sf = fopen ("/opt/osdp-conformance/run/PD/open-osdp-status.json", "r");
   if (sf != NULL)
   {
     (void) fread (buffer, sizeof (buffer [0]), sizeof (buffer), sf);
@@ -171,7 +172,6 @@ int
       (unsigned long int)current_time_fine.tv_sec, current_time_fine.tv_nsec,
       asctime (localtime (&current_time)));
 
-  sf = fopen ("/opt/osdp-conformance/run/PD/open-osdp-status.json", "r");
   if (strlen (buffer) > 0)
   {
     printf ("%s", buffer);

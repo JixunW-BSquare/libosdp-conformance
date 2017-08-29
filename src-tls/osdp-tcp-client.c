@@ -257,7 +257,7 @@ int
     tag = "CP";
   else
     tag = "PD";
-  sprintf (sn, "/opt/osdp-conformance/run/%s/open-osdp-control", tag);
+  sprintf (sn, OSDP_BASE_DIR "/run/%s/open-osdp-control", tag);
 
   ufd = socket (AF_UNIX, SOCK_STREAM, 0);
   if (ufd != -1)

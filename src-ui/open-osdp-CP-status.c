@@ -63,7 +63,8 @@ int
   int status_io;
   char buffer [16384];
 
-  sf = fopen ("/opt/osdp-conformance/run/CP/open-osdp-status.json", "r");
+  sprintf(buffer, OSDP_LCL_STATUS_PATH, "CP");
+  sf = fopen (buffer, "r");
   if (sf != NULL)
   {
     status_io = fread (buffer, sizeof (buffer [0]), sizeof (buffer), sf);
