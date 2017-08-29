@@ -50,7 +50,7 @@ add_executable(osdp-diag-01 test/diags/diag01.c)
 install(TARGETS osdp DESTINATION lib)
 install(TARGETS open-osdp DESTINATION bin)
 install(TARGETS osdp-sign DESTINATION bin)
-install(FILES poke DESTINATION bin RENAME osdp-poke)
+install(PROGRAMS poke DESTINATION bin RENAME osdp-poke)
 install(FILES ${COMMON_HEADER_FILES} DESTINATION include/${PROJECT_NAME})
 
 add_custom_target(buildtest COMMAND ./osdp-diag-01)
