@@ -21,7 +21,7 @@
 CC=gcc
 #CC=clang
 CFLAGS=-DOSDP_CONFORMANCE -I /tester/current/include
-LDFLAGS=/opt/osdp-conformance/lib/aes.o -L /tester/current/lib
+LDFLAGS=-L /tester/current/lib
 
 PROGS = open-osdp
 
@@ -38,7 +38,7 @@ build:	all
 open-osdp:	open-osdp.o Makefile ../src-lib/libosdp.a
 	${CC} ${LDFLAGS} -o open-osdp -g open-osdp.o \
 	  -L ../src-lib -losdp \
-	  -ljansson -lrt
+	  -ljansson -ltinyaes -lrt
 
 open-osdp.o:	open-osdp.c
 	${CC} ${CFLAGS} -c -g -I. -I../include -Wall -Werror \
