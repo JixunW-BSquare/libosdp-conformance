@@ -7,6 +7,7 @@ include_directories(include src-485 src-lib src-tls src-ui)
 
 set (COMMON_HEADER_FILES
         include/open-osdp.h
+        include/osdp-local-config.h
         include/osdp_conformance.h)
 
 set (LIB_SOURCE_FILES
@@ -26,7 +27,6 @@ set (LIB_SOURCE_FILES
         ${COMMON_HEADER_FILES})
 
 set(SOURCE_FILES
-        src-485/osdp-local-config.h
         src-485/open-osdp.c
         ${COMMON_HEADER_FILES})
 

@@ -25,6 +25,7 @@
 extern "C" {
 #endif
 
+#include "osdp-local-config.h"
 
 #ifndef max
 #define max(a, b) (a > b ? a : b)

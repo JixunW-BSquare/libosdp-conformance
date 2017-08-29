@@ -17,6 +17,16 @@ import time
 import json
 import re
 
+OSDP_BASE_DIR = "./tmp"
+
+OSDP_LCL_CA_KEYS        = OSDP_BASE_DIR + "/etc/ca_keys.pem"
+OSDP_LCL_SERVER_CERT    = OSDP_BASE_DIR + "/etc/cert.pem"
+OSDP_LCL_SERVER_KEY     = OSDP_BASE_DIR + "/etc/key.pem"
+OSDP_LCL_COMMAND_PATH   = OSDP_BASE_DIR + "/run/%s/open_osdp_command.json"
+OSDP_LCL_STATUS_PATH    = OSDP_BASE_DIR + "/run/%s/open-osdp-status.json"
+OSDP_LCL_SERVER_RESULTS = OSDP_BASE_DIR + "/run/%s"
+OSDP_LCL_UNIX_SOCKET    = OSDP_BASE_DIR + "/run/%s/open-osdp-control"
+
 COMMON_KEYS = [
     "role", "#", "serial_speed", "pd_address", "max_pd_send", "cp_polls",
     "pd_acks", "sent_naks", "out-00", "out-01", "out-02", "out-03",
@@ -79,7 +89,7 @@ def poke(cmd, tag, remove_common_attrs=True):
 
     # prepare command
     print_erasable("writing command...")
-    cmd_path = './tmp/command_%s.json' % tag
+    cmd_path = OSDP_LCL_COMMAND_PATH % tag
     delete_file(cmd_path)
     with open(cmd_path, 'w') as file:
         file.write(cmd)
@@ -88,10 +98,10 @@ def poke(cmd, tag, remove_common_attrs=True):
     print_json(cmd)
 
     # poke so it knows it need to execute command
-    result_path = './tmp/result_%s' % tag
+    result_path = OSDP_LCL_STATUS_PATH % tag
     delete_file(result_path)
 
-    socket_path = './tmp/socket_%s' % tag
+    socket_path = OSDP_LCL_UNIX_SOCKET % tag
     sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     sock.connect(socket_path)
     sock.send(bytes('< poke >', 'utf-8'))

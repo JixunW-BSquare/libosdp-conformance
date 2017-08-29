@@ -19,6 +19,8 @@
   http://www.securityindustry.org
 */
 
+#pragma once
+
 #if ENABLE_WEB_RPC
 #define OSDP_BASE_DIR "/opt/osdp-conformance"
 #else
@@ -31,6 +33,7 @@
 #define OSDP_LCL_SERVER_CERT    OSDP_BASE_DIR "/etc/cert.pem"
 #define OSDP_LCL_SERVER_KEY     OSDP_BASE_DIR "/etc/key.pem"
 #define OSDP_LCL_COMMAND_PATH   OSDP_BASE_DIR "/run/%s/open_osdp_command.json"
+#define OSDP_LCL_STATUS_PATH    OSDP_BASE_DIR "/run/%s/open-osdp-status.json"
 #define OSDP_LCL_SERVER_RESULTS OSDP_BASE_DIR "/run/%s"
 #define OSDP_LCL_UNIX_SOCKET    OSDP_BASE_DIR "/run/%s/open-osdp-control"
 
