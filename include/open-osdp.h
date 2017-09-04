@@ -20,6 +20,18 @@
 */
 
 
+#define max(a, b)  ( a > b ? a : b )
+#define min(a, b)  ( a < b ? a : b )
+
+#ifdef ENABLE_WEB_RPC
+#undef ENABLE_WEB_RPC
+#define ENABLE_WEB_RPC 1
+#else
+#define ENABLE_WEB_RPC 0
+#endif
+
+#include <stdio.h>
+#include <stdlib.h>
 #include <termios.h>
 #include <time.h>
 
@@ -152,6 +164,8 @@
 #define OSDP_CMDB_BUZZ          (1022)
 #define OSDP_CMDB_BUSY          (1023)
 #define OSDP_CMDB_KEYPAD        (1024)
+
+#define OSDP_CMDB_SEND_BUFFER   (2001)
 
 #define OSDP_CMD_NOOP         (0)
 #define OSDP_CMD_CP_DIAG      (1)
